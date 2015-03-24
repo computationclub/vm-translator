@@ -37,7 +37,7 @@ M=M+D
 
 ## Testing
 
-Most of the tests depend upon the CPU emulator provided as part of the [Nand2Tetris Software Suite](http://nand2tetris.org/software.php). Before running the tests, download and unzip [nand2tetris.zip](http://nand2tetris.org/software/nand2tetris.zip) and set the environment variable `EMULATOR` to the path of the `nand2tetris/tools/CPUEmulator.sh` script.
+Most of the tests depend upon the CPU emulator provided as part of the [Nand2Tetris Software Suite](http://nand2tetris.org/software.php). Before running the tests, download and unzip [nand2tetris.zip](http://nand2tetris.org/software/nand2tetris.zip) and set the environment variable `EMULATOR` to the path of the `nand2tetris/tools/CPUEmulator.sh` script. If you prefer, you can use [Vagrant](https://www.vagrantup.com/) to set up a Linux VM with the CPU emulator already installed; just type `vagrant up`.
 
 Both unit and acceptance tests are provided.
 
