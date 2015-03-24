@@ -12,6 +12,8 @@ class CodeWriter
       'sub' => '-',
       'and' => '&',
       'or'  => '|',
+      'neg' => '-',
+      'not' => '!'
     }.fetch(command)
   end
 
@@ -29,6 +31,12 @@ class CodeWriter
         A=A-1
         // Add M[SP] to M[SP-1]
         M=M#{operand(command)}D
+      EOF
+    when 'neg', 'not'
+      output.puts <<-EOF
+        @SP
+        A=M-1
+        M=#{operand(command)}M
       EOF
     when 'eq', 'gt', 'lt'
       output.puts <<-EOF
