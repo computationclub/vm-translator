@@ -6,9 +6,18 @@ class CodeWriter
   def set_file_name(filename)
   end
 
+  def operand(command)
+    {
+      'add' => '+',
+      'sub' => '-',
+      'and' => '&',
+      'or'  => '|',
+    }.fetch(command)
+  end
+
   def write_arithmetic(command)
     case command
-    when 'add'
+    when 'add', 'sub', 'and', 'or'
       output.puts <<-EOF
         @SP
         // SP--
@@ -19,8 +28,7 @@ class CodeWriter
         // Load M[SP-1]
         A=A-1
         // Add M[SP] to M[SP-1]
-        // Store results in M[SP-1]
-        M=D+M
+        M=M#{operand(command)}D
       EOF
     when 'eq', 'gt', 'lt'
       output.puts <<-EOF
