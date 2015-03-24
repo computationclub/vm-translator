@@ -50,7 +50,7 @@ class Emulation
   end
 
   def parse_output(output)
-    output.each_line.map(&method(:parse_output_line)).transpose.to_h
+    Hash[output.each_line.map(&method(:parse_output_line)).transpose]
   end
 
   def parse_output_line(line)

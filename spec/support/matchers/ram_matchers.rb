@@ -26,7 +26,7 @@ module RamMatchers
     chain :from, :ram_description_before
     chain :to, :expected_ram_description_after
     chain :in, :explicit_cycle_count
-    alias :cycles :itself # syntactic sugar
+    def cycles; self; end # syntactic sugar
 
     attr_accessor :actual_ram_after, :matcher
 
@@ -85,7 +85,7 @@ module RamMatchers
     end
 
     def get_segment_ram(segment, values)
-      values.zip(get_segment_addresses(segment)).map(&:reverse).to_h
+      Hash[values.zip(get_segment_addresses(segment)).map(&:reverse)]
     end
 
     def get_segment_addresses(segment)

@@ -30,7 +30,7 @@ RSpec.describe 'the translator' do
         script_pathname = dir_pathname + script_pathname.basename
         output_pathname = script_pathname.sub_ext(EXT[:output])
 
-        output_pathname.write output
+        File.write(output_pathname, output)
         error, status = emulator.run(script_pathname.to_path)
 
         unless status.success?
@@ -38,7 +38,7 @@ RSpec.describe 'the translator' do
 
           expected_pathname = script_pathname.sub_ext(EXT[:expected])
           actual_pathname = script_pathname.sub_ext(EXT[:actual])
-          expect(actual_pathname.read).to eq expected_pathname.read
+          expect(File.read(actual_pathname)).to eq File.read(expected_pathname)
         end
       end
     end
