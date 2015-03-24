@@ -22,6 +22,20 @@ class CodeWriter
     EOF
   end
 
+  def write_push_pop(command, segment, index)
+    output.puts <<-EOF
+      // Load index into M[SP]
+      @#{index}
+      D=A
+      @SP
+      A=M
+      M=D
+      // SP++
+      @SP
+      M=M+1
+    EOF
+  end
+
   private
 
   attr_reader :output
