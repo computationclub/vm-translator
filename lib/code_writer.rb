@@ -1,20 +1,10 @@
 class CodeWriter
   def initialize(output)
-    @output = output
+    @output  = output
+    @counter = 0
   end
 
   def set_file_name(filename)
-  end
-
-  def operand(command)
-    {
-      'add' => '+',
-      'sub' => '-',
-      'and' => '&',
-      'or'  => '|',
-      'neg' => '-',
-      'not' => '!'
-    }.fetch(command)
   end
 
   def write_arithmetic(command)
@@ -39,6 +29,7 @@ class CodeWriter
         M=#{operand(command)}M
       EOF
     when 'eq', 'gt', 'lt'
+      true_label, end_label = 2.times.map { generate_label }
       output.puts <<-EOF
         @SP
         // SP--
@@ -51,7 +42,7 @@ class CodeWriter
         // Subtract M[SP-1] from M[SP]
         D=M-D
         // If the result satisfies command then jump to (TRUE)
-        @TRUE
+        @#{true_label}
         D;J#{command.upcase}
         // Load M[SP]
         @SP
@@ -59,15 +50,15 @@ class CodeWriter
         // M[SP-1] = 0
         M=0
         // Jump to (END)
-        @END
+        @#{end_label}
         0;JMP
-        (TRUE)
+        (#{true_label})
         // Load M[SP]
         @SP
         A=M-1
         // M[SP-1] = -1
         M=-1
-        (END)
+        (#{end_label})
       EOF
     end
   end
@@ -89,4 +80,20 @@ class CodeWriter
   private
 
   attr_reader :output
+
+  def operand(command)
+    {
+      'add' => '+',
+      'sub' => '-',
+      'and' => '&',
+      'or'  => '|',
+      'neg' => '-',
+      'not' => '!'
+    }.fetch(command)
+  end
+
+  def generate_label
+    @counter += 1
+    "LABEL#{@counter}"
+  end
 end
