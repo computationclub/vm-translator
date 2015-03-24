@@ -32,8 +32,8 @@ class CodeWriter
         D=M
         // Load M[SP-1]
         A=A-1
-        // Subtract M[SP] from M[SP-1]
-        D=D-M
+        // Subtract M[SP-1] from M[SP]
+        D=M-D
         // If the result == 0 then jump to (EQUAL)
         @EQUAL
         D;JEQ
@@ -46,6 +46,37 @@ class CodeWriter
         @END
         0;JMP
         (EQUAL)
+        // Load M[SP]
+        @SP
+        A=M-1
+        // M[SP-1] = -1
+        M=-1
+        (END)
+      EOF
+    when 'lt'
+      output.puts <<-EOF
+        @SP
+        // SP--
+        MD=M-1
+        // Load M[SP]
+        A=M
+        D=M
+        // Load M[SP-1]
+        A=A-1
+        // Subtract M[SP-1] from M[SP]
+        D=M-D
+        // If the result < 0 then jump to (LESSTHAN)
+        @LESSTHAN
+        D;JLT
+        // Load M[SP]
+        @SP
+        A=M-1
+        // M[SP-1] = 0
+        M=0
+        // Jump to (END)
+        @END
+        0;JMP
+        (LESSTHAN)
         // Load M[SP]
         @SP
         A=M-1
