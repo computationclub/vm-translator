@@ -25,6 +25,15 @@ class Parser
     end
   end
 
+  def arg1
+    case command_type
+    when C_PUSH, C_POP
+      current.split[1]
+    else
+      current
+    end
+  end
+
   private
 
   attr_reader :lines, :current
