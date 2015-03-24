@@ -34,6 +34,10 @@ class Parser
     end
   end
 
+  def arg2
+    Integer(current.split[2])
+  end
+
   private
 
   attr_reader :lines, :current
