@@ -48,3 +48,5 @@ To run all of the tests, use `bundle exec rspec`.
 ### Test dependencies
 
 Most of the tests depend upon the CPU emulator provided as part of the [Nand2Tetris Software Suite](http://nand2tetris.org/software.php). Before running the tests, download and unzip [nand2tetris.zip](http://nand2tetris.org/software/nand2tetris.zip) and set the environment variable `EMULATOR` to the path of the `nand2tetris/tools/CPUEmulator.sh` script. If you prefer, you can use [Vagrant](https://www.vagrantup.com/) to set up a Linux VM with the CPU emulator already installed; just type `vagrant up`.
+
+Alternatively, the tests are also compatible with [@Ryman](https://github.com/Ryman)’s [Rust implementation](https://github.com/Ryman/hack_simulator) of a CPU emulator, so you can use that instead of the official Java one. Just set `EMULATOR` to the path of the `hack_simulator/emulator.sh` script instead.
