@@ -37,8 +37,6 @@ M=M+D
 
 ## Testing
 
-Most of the tests depend upon the CPU emulator provided as part of the [Nand2Tetris Software Suite](http://nand2tetris.org/software.php). Before running the tests, download and unzip [nand2tetris.zip](http://nand2tetris.org/software/nand2tetris.zip) and set the environment variable `EMULATOR` to the path of the `nand2tetris/tools/CPUEmulator.sh` script. If you prefer, you can use [Vagrant](https://www.vagrantup.com/) to set up a Linux VM with the CPU emulator already installed; just type `vagrant up`.
-
 Both unit and acceptance tests are provided.
 
 The unit tests verify that each module (`Parser` and `CodeWriter`) implements the API described in chapter seven. To run them, use `bundle exec rspec spec/unit`.
@@ -46,3 +44,7 @@ The unit tests verify that each module (`Parser` and `CodeWriter`) implements th
 The acceptance tests run `bin/translator` against each [example VM program](spec/acceptance/examples) and check the emulated behaviour of its output. To run them, use `bundle exec rspec spec/acceptance`.
 
 To run all of the tests, use `bundle exec rspec`.
+
+### Test dependencies
+
+Most of the tests depend upon the CPU emulator provided as part of the [Nand2Tetris Software Suite](http://nand2tetris.org/software.php). Before running the tests, download and unzip [nand2tetris.zip](http://nand2tetris.org/software/nand2tetris.zip) and set the environment variable `EMULATOR` to the path of the `nand2tetris/tools/CPUEmulator.sh` script. If you prefer, you can use [Vagrant](https://www.vagrantup.com/) to set up a Linux VM with the CPU emulator already installed; just type `vagrant up`.
