@@ -30,12 +30,12 @@ RSpec.describe 'the translator' do
       expect(error).to be_empty
       expect(status).to be_success
 
-      Dir.mktmpdir do |dir|
-        FileUtils.cp_r directory_pathname, dir
-        dir_pathname = Pathname.new(dir) + base_filename
+      Dir.mktmpdir do |temporary_directory|
+        FileUtils.cp_r directory_pathname, temporary_directory
+        directory_pathname = Pathname.new(temporary_directory) + base_filename
 
-        script_pathname = dir_pathname + script_filename
-        output_pathname = dir_pathname + output_filename
+        script_pathname = directory_pathname + script_filename
+        output_pathname = directory_pathname + output_filename
 
         File.write(output_pathname, output)
         error, status = emulator.run(script_pathname.to_path)
@@ -43,8 +43,8 @@ RSpec.describe 'the translator' do
         unless status.success?
           STDERR.write error
 
-          expected_pathname = dir_pathname + expected_filename
-          actual_pathname = dir_pathname + actual_filename
+          expected_pathname = directory_pathname + expected_filename
+          actual_pathname = directory_pathname + actual_filename
           expect(File.read(actual_pathname)).to eq File.read(expected_pathname)
         end
       end
