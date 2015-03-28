@@ -10,15 +10,20 @@ RSpec.describe 'the translator' do
   TRANSLATOR_PATH = File.expand_path('../../../bin/translator', __FILE__)
   EXAMPLES_PATH = File.expand_path('../examples', __FILE__)
 
-  EXT = { input: '.vm', output: '.asm', script: '.tst', expected: '.cmp', actual: '.out' }
+  EXT = { input: '.vm', script: '.tst' }
 
   Pathname.new(EXAMPLES_PATH).children.select(&:directory?).each do |directory_pathname|
     base_filename = directory_pathname.basename
     base_pathname = directory_pathname + base_filename
-    output_pathname = base_pathname.sub_ext(EXT[:output])
     script_pathname = base_pathname.sub_ext(EXT[:script])
+    script_filename = script_pathname.basename
 
-    it "generates a #{output_pathname.basename} file which satisfies #{script_pathname.basename}" do
+    script = File.read(script_pathname)
+    output_filename = script.slice(/load (?<filename>[^,\s]+)/, :filename)
+    actual_filename = script.slice(/output-file (?<filename>[^,\s]+)/, :filename)
+    expected_filename = script.slice(/compare-to (?<filename>[^,\s]+)/, :filename)
+
+    it "generates a #{output_filename} file which satisfies #{script_filename}" do
       input_pathname = base_pathname.sub_ext(EXT[:input])
       output, error, status = Open3.capture3(TRANSLATOR_PATH, input_pathname.to_path)
       expect(output).not_to be_empty
@@ -26,13 +31,13 @@ RSpec.describe 'the translator' do
       expect(status).to be_success
 
       Dir.mktmpdir do |dir|
-        expected_pathname = base_pathname.sub_ext(EXT[:expected])
+        expected_pathname = directory_pathname + expected_filename
         dir_pathname = Pathname.new(dir)
 
         FileUtils.cp [script_pathname, expected_pathname], dir_pathname
 
-        script_pathname = dir_pathname + script_pathname.basename
-        output_pathname = dir_pathname + output_pathname.basename
+        script_pathname = dir_pathname + script_filename
+        output_pathname = dir_pathname + output_filename
 
         File.write(output_pathname, output)
         error, status = emulator.run(script_pathname.to_path)
@@ -40,8 +45,8 @@ RSpec.describe 'the translator' do
         unless status.success?
           STDERR.write error
 
-          expected_pathname = script_pathname.sub_ext(EXT[:expected])
-          actual_pathname = script_pathname.sub_ext(EXT[:actual])
+          expected_pathname = dir_pathname + expected_filename
+          actual_pathname = dir_pathname + actual_filename
           expect(File.read(actual_pathname)).to eq File.read(expected_pathname)
         end
       end
