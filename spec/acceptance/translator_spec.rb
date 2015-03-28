@@ -12,8 +12,11 @@ RSpec.describe 'the translator' do
 
   EXT = { input: '.vm', output: '.asm', script: '.tst', expected: '.cmp', actual: '.out' }
 
-  Pathname.glob(File.join(EXAMPLES_PATH, '**', '*' + EXT[:input])) do |input_pathname|
-    script_pathname = input_pathname.sub_ext(EXT[:script])
+  Pathname.new(EXAMPLES_PATH).children.select(&:directory?).each do |directory_pathname|
+    base_filename = directory_pathname.basename
+    base_pathname = directory_pathname + base_filename
+    input_pathname = base_pathname.sub_ext(EXT[:input])
+    script_pathname = base_pathname.sub_ext(EXT[:script])
 
     it "translates #{input_pathname.basename} into a file which satisfies #{script_pathname.basename}" do
       output, error, status = Open3.capture3(TRANSLATOR_PATH, input_pathname.to_path)
@@ -22,7 +25,7 @@ RSpec.describe 'the translator' do
       expect(status).to be_success
 
       Dir.mktmpdir do |dir|
-        expected_pathname = input_pathname.sub_ext(EXT[:expected])
+        expected_pathname = base_pathname.sub_ext(EXT[:expected])
         dir_pathname = Pathname.new(dir)
 
         FileUtils.cp [script_pathname, expected_pathname], dir_pathname
