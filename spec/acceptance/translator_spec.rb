@@ -31,10 +31,8 @@ RSpec.describe 'the translator' do
       expect(status).to be_success
 
       Dir.mktmpdir do |dir|
-        expected_pathname = directory_pathname + expected_filename
-        dir_pathname = Pathname.new(dir)
-
-        FileUtils.cp [script_pathname, expected_pathname], dir_pathname
+        FileUtils.cp_r directory_pathname, dir
+        dir_pathname = Pathname.new(dir) + base_filename
 
         script_pathname = dir_pathname + script_filename
         output_pathname = dir_pathname + output_filename
