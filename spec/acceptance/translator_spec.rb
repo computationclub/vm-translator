@@ -15,10 +15,11 @@ RSpec.describe 'the translator' do
   Pathname.new(EXAMPLES_PATH).children.select(&:directory?).each do |directory_pathname|
     base_filename = directory_pathname.basename
     base_pathname = directory_pathname + base_filename
-    input_pathname = base_pathname.sub_ext(EXT[:input])
+    output_pathname = base_pathname.sub_ext(EXT[:output])
     script_pathname = base_pathname.sub_ext(EXT[:script])
 
-    it "translates #{input_pathname.basename} into a file which satisfies #{script_pathname.basename}" do
+    it "generates a #{output_pathname.basename} file which satisfies #{script_pathname.basename}" do
+      input_pathname = base_pathname.sub_ext(EXT[:input])
       output, error, status = Open3.capture3(TRANSLATOR_PATH, input_pathname.to_path)
       expect(output).not_to be_empty
       expect(error).to be_empty
@@ -31,7 +32,7 @@ RSpec.describe 'the translator' do
         FileUtils.cp [script_pathname, expected_pathname], dir_pathname
 
         script_pathname = dir_pathname + script_pathname.basename
-        output_pathname = script_pathname.sub_ext(EXT[:output])
+        output_pathname = dir_pathname + output_pathname.basename
 
         File.write(output_pathname, output)
         error, status = emulator.run(script_pathname.to_path)
