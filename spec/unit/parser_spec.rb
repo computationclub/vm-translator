@@ -151,22 +151,28 @@ RSpec.describe Parser do
     end
 
     {
-      'add'              => :C_ARITHMETIC,
-      'sub'              => :C_ARITHMETIC,
-      'neg'              => :C_ARITHMETIC,
-      'eq'               => :C_ARITHMETIC,
-      'gt'               => :C_ARITHMETIC,
-      'lt'               => :C_ARITHMETIC,
-      'and'              => :C_ARITHMETIC,
-      'or'               => :C_ARITHMETIC,
-      'not'              => :C_ARITHMETIC,
-      'pop static 8'     => :C_POP,
-      'push constant 57' => :C_PUSH
+      'add'                     => :C_ARITHMETIC,
+      'sub'                     => :C_ARITHMETIC,
+      'neg'                     => :C_ARITHMETIC,
+      'eq'                      => :C_ARITHMETIC,
+      'gt'                      => :C_ARITHMETIC,
+      'lt'                      => :C_ARITHMETIC,
+      'and'                     => :C_ARITHMETIC,
+      'or'                      => :C_ARITHMETIC,
+      'not'                     => :C_ARITHMETIC,
+      'pop static 8'            => :C_POP,
+      'push constant 57'        => :C_PUSH,
+      'label LOOP_START'        => :C_LABEL,
+      'goto WHILE'              => :C_GOTO,
+      'if-goto COMPUTE_ELEMENT' => :C_IF,
+      'function Sys.add12 3'    => :C_FUNCTION,
+      'call Main.fibonacci 1'   => :C_CALL,
+      'return'                  => :C_RETURN
     }.each do |command, type|
       context "when the current command is #{command}" do
         let(:input) { command }
 
-        it "returns #{type}" do
+        it "returns #{type}", pending: [:C_LABEL, :C_GOTO, :C_IF, :C_FUNCTION, :C_CALL, :C_RETURN].include?(type) do
           expect(parser.command_type).to eq Parser.const_get(type)
         end
       end
@@ -201,6 +207,46 @@ RSpec.describe Parser do
         expect(parser.arg1).to eq 'static'
       end
     end
+
+    context 'when the current command is a label' do
+      let(:input) { 'label LOOP_START' }
+
+      it 'returns the first argument', :pending do
+        expect(parser.arg1).to eq 'LOOP_START'
+      end
+    end
+
+    context 'when the current command is a goto' do
+      let(:input) { 'goto WHILE' }
+
+      it 'returns the first argument', :pending do
+        expect(parser.arg1).to eq 'WHILE'
+      end
+    end
+
+    context 'when the current command is an if-goto' do
+      let(:input) { 'if-goto COMPUTE_ELEMENT' }
+
+      it 'returns the first argument', :pending do
+        expect(parser.arg1).to eq 'COMPUTE_ELEMENT'
+      end
+    end
+
+    context 'when the current command is a function definition' do
+      let(:input) { 'function Sys.add12 3' }
+
+      it 'returns the first argument', :pending do
+        expect(parser.arg1).to eq 'Sys.add12'
+      end
+    end
+
+    context 'when the current command is a function call' do
+      let(:input) { 'call Main.fibonacci 1' }
+
+      it 'returns the first argument', :pending do
+        expect(parser.arg1).to eq 'Main.fibonacci'
+      end
+    end
   end
 
   describe '#arg2' do
@@ -221,6 +267,22 @@ RSpec.describe Parser do
 
       it 'returns the second argument' do
         expect(parser.arg2).to eq 8
+      end
+    end
+
+    context 'when the current command is a function definition' do
+      let(:input) { 'function Sys.add12 3' }
+
+      it 'returns the second argument' do
+        expect(parser.arg2).to eq 3
+      end
+    end
+
+    context 'when the current command is a function call' do
+      let(:input) { 'call Main.fibonacci 1' }
+
+      it 'returns the second argument' do
+        expect(parser.arg2).to eq 1
       end
     end
   end
