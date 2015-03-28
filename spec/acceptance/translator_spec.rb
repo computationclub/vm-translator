@@ -12,7 +12,7 @@ RSpec.describe 'the translator' do
 
   EXT = { input: '.vm', output: '.asm', script: '.tst', expected: '.cmp', actual: '.out' }
 
-  Pathname.new(EXAMPLES_PATH).children.select { |p| p.extname == EXT[:input] }.each do |input_pathname|
+  Pathname.glob(File.join(EXAMPLES_PATH, '**', '*' + EXT[:input])) do |input_pathname|
     script_pathname = input_pathname.sub_ext(EXT[:script])
 
     it "translates #{input_pathname.basename} into a file which satisfies #{script_pathname.basename}" do
