@@ -32,6 +32,8 @@ class RamDescription < Struct.new(:hash)
     case segment
     when Numeric
       segment_contents_ram(segment)
+    when :pointers
+      hash.fetch(segment, {}).keys.map(&method(:segment_pointer_ram)).inject({}, :merge)
     else
       segment_ram = segment_contents_ram(segment)
       pointer_ram = segment_pointer_ram(segment)
@@ -81,15 +83,21 @@ class RamDescription < Struct.new(:hash)
   end
 
   def segment_pointer_address(segment)
-    segment_base_address =
-      case segment
-      when Numeric
-        segment
-      else
-        DEFAULT_SEGMENT_POINTER.fetch(segment)
-      end
+    pointers = hash.fetch(:pointers, {})
 
-    segment_base_address + segment_pointer_offset(segment)
+    if pointers.has_key?(segment)
+      pointers.fetch(segment)
+    else
+      segment_base_address =
+        case segment
+        when Numeric
+          segment
+        else
+          DEFAULT_SEGMENT_POINTER.fetch(segment)
+        end
+
+      segment_base_address + segment_pointer_offset(segment)
+    end
   end
 
   def segment_pointer_offset(segment)
