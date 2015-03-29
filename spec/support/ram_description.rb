@@ -29,10 +29,15 @@ class RamDescription < Struct.new(:hash)
   end
 
   def segment_ram(segment)
-    segment_ram = segment_contents_ram(segment)
-    pointer_ram = segment_pointer_ram(segment)
+    case segment
+    when Numeric
+      segment_contents_ram(segment)
+    else
+      segment_ram = segment_contents_ram(segment)
+      pointer_ram = segment_pointer_ram(segment)
 
-    pointer_ram.merge(segment_ram)
+      pointer_ram.merge(segment_ram)
+    end
   end
 
   def segment_contents_ram(segment)
@@ -76,7 +81,15 @@ class RamDescription < Struct.new(:hash)
   end
 
   def segment_pointer_address(segment)
-    DEFAULT_SEGMENT_POINTER.fetch(segment) + segment_pointer_offset(segment)
+    segment_base_address =
+      case segment
+      when Numeric
+        segment
+      else
+        DEFAULT_SEGMENT_POINTER.fetch(segment)
+      end
+
+    segment_base_address + segment_pointer_offset(segment)
   end
 
   def segment_pointer_offset(segment)
