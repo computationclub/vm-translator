@@ -26,8 +26,7 @@ class RamDescription < Struct.new(:hash)
 
   def ram_from_segment_values(segment, values)
     segment_ram = get_segment_ram(segment, get_numeric_values(values))
-    segment_addresses = segment_ram.each_key
-    pointer_ram = get_pointer_ram(segment, segment_addresses)
+    pointer_ram = get_pointer_ram(segment)
 
     pointer_ram.merge(segment_ram)
   end
@@ -55,21 +54,25 @@ class RamDescription < Struct.new(:hash)
     end
   end
 
-  def get_pointer_ram(segment, addresses)
+  def get_pointer_ram(segment)
     case segment
     when :stack, :local, :argument, :this, :that
-      { POINTER_ADDRESS.fetch(segment) => get_pointer_address(segment, addresses) }
+      { POINTER_ADDRESS.fetch(segment) => get_pointer_address(segment) }
     else
       {}
     end
   end
 
-  def get_pointer_address(segment, addresses)
+  def get_pointer_address(segment)
+    get_segment_address(segment) + get_pointer_offset(segment)
+  end
+
+  def get_pointer_offset(segment)
     case segment
     when :stack
-      addresses.max.succ
+      Array(hash.fetch(:stack, [])).length
     else
-      addresses.min
+      0
     end
   end
 end
