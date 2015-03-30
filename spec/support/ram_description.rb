@@ -37,7 +37,11 @@ class RamDescription < Struct.new(:hash)
   end
 
   def get_segment_addresses(segment)
-    SEGMENT_ADDRESS.fetch(segment).upto(Float::INFINITY)
+    get_segment_address(segment).upto(Float::INFINITY)
+  end
+
+  def get_segment_address(segment)
+    SEGMENT_ADDRESS.fetch(segment)
   end
 
   def get_numeric_values(values)
