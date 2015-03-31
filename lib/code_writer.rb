@@ -120,42 +120,50 @@ class CodeWriter
   end
 
   def load_base_address_into_r13(segment, offset)
-    case segment
-    when 'temp'
-      output.puts <<-EOF
-        @#{5 + offset}
-        D=A
-      EOF
-    when 'pointer'
-      output.puts <<-EOF
-        @#{3 + offset}
-        D=A
-      EOF
-    when 'static'
-      output.puts <<-EOF
-        @STATIC.#{offset}
-        D=A
-      EOF
-    else
-      output.puts <<-EOF
-        // Get base address of the local segment
-        @#{base_address(segment)} // A=1
-        D=M         // D=RAM[1]=300
-      EOF
-
-      if offset > 0
-        output.puts <<-EOF
-          // Add the index offset to the base address
-          @#{offset}   // A=2
-          D=A+D        // D=302
-        EOF
-      end
-    end
+    load_destination_into_d(segment, offset)
 
     output.puts <<-EOF
       // Store the destination in R13
       @R13        // A=13
       M=D         // RAM[13]=302
+    EOF
+  end
+
+  def load_destination_into_d(segment, offset)
+    output.puts "@#{symbol_for_segment(segment, offset)}"
+
+    if symbol_known_at_compile_time?(segment)
+      output.puts "D=A"
+    else
+      output.puts "D=M"
+      apply_offset_at_runtime(offset)
+    end
+  end
+
+  def symbol_for_segment(segment, offset)
+    case segment
+    when 'temp'
+      5 + offset
+    when 'pointer'
+      3 + offset
+    when 'static'
+      "STATIC.#{offset}"
+    else
+      base_address(segment)
+    end
+  end
+
+  def symbol_known_at_compile_time?(segment)
+    %w(temp pointer static).include? segment
+  end
+
+  def apply_offset_at_runtime(offset)
+    return if offset.zero?
+
+    output.puts <<-EOF
+      // Add the index offset to the base address
+      @#{offset}
+      D=A+D
     EOF
   end
 
