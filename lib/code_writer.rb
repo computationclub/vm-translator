@@ -80,7 +80,7 @@ class CodeWriter
     when Parser::C_POP
       output.puts <<-EOF
         // Get base address of the local segment
-        @LCL        // A=1
+        @#{base_address(segment)} // A=1
         D=M         // D=RAM[1]=300
         // Add the index offset to the base address
         @#{index}   // A=2
@@ -114,6 +114,13 @@ class CodeWriter
       'neg' => '-',
       'not' => '!'
     }.fetch(command)
+  end
+
+  def base_address(segment)
+    {
+      'local'    => 'LCL',
+      'argument' => 'ARG'
+    }.fetch(segment)
   end
 
   def generate_label
