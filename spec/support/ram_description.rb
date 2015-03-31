@@ -82,7 +82,7 @@ class RamDescription < Struct.new(:hash)
   def segment_pointer_offset(segment)
     case segment
     when :stack
-      Array(hash.fetch(:stack, [])).length
+      segment_contents(segment).length
     else
       0
     end
