@@ -1,5 +1,5 @@
 class RamDescription < Struct.new(:hash)
-  POINTER_ADDRESS = {
+  SEGMENT_POINTER_ADDRESS = {
     stack:    0,
     local:    1,
     argument: 2,
@@ -7,7 +7,7 @@ class RamDescription < Struct.new(:hash)
     that:     4
   }
 
-  SEGMENT_ADDRESS = {
+  DEFAULT_SEGMENT_BASE_ADDRESS = {
     temp:     5,
     static:   16,
     stack:    256,
@@ -15,7 +15,7 @@ class RamDescription < Struct.new(:hash)
     argument: 400,
     this:     3000,
     that:     3010,
-    pointer:  POINTER_ADDRESS[:this]
+    pointer:  SEGMENT_POINTER_ADDRESS[:this]
   }
 
   def to_ram
@@ -60,13 +60,13 @@ class RamDescription < Struct.new(:hash)
   end
 
   def segment_base_address(segment)
-    SEGMENT_ADDRESS.fetch(segment)
+    DEFAULT_SEGMENT_BASE_ADDRESS.fetch(segment)
   end
 
   def segment_pointer_ram(segment)
     case segment
     when :stack, :local, :argument, :this, :that
-      { POINTER_ADDRESS.fetch(segment) => segment_pointer_address(segment) }
+      { SEGMENT_POINTER_ADDRESS.fetch(segment) => segment_pointer_address(segment) }
     else
       {}
     end
