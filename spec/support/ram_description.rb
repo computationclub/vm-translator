@@ -25,7 +25,7 @@ class RamDescription < Struct.new(:hash)
   private
 
   def ram_from_segment_values(segment)
-    segment_ram = get_segment_ram(segment)
+    segment_ram = get_segment_contents_ram(segment)
     pointer_ram = get_pointer_ram(segment)
 
     pointer_ram.merge(segment_ram)
@@ -35,7 +35,7 @@ class RamDescription < Struct.new(:hash)
     Array(hash.fetch(segment)).map(&method(:value_to_number))
   end
 
-  def get_segment_ram(segment)
+  def get_segment_contents_ram(segment)
     values = get_segment_values(segment)
     addresses = get_segment_addresses(segment)
 
