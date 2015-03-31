@@ -95,7 +95,7 @@ class CodeWriter
         @#{index}
         D=A
       EOF
-    when 'local'
+    else
       load_base_address_into_r13(segment, index)
       output.puts <<-EOF
         @R13
