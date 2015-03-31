@@ -119,7 +119,8 @@ class CodeWriter
   def base_address(segment)
     {
       'local'    => 'LCL',
-      'argument' => 'ARG'
+      'argument' => 'ARG',
+      'this'     => 'THIS'
     }.fetch(segment)
   end
 
