@@ -35,15 +35,15 @@ class RamDescription < Struct.new(:hash)
     pointer_ram.merge(segment_ram)
   end
 
-  def segment_values(segment)
+  def segment_contents(segment)
     Array(hash.fetch(segment)).map(&method(:value_to_number))
   end
 
   def segment_contents_ram(segment)
-    values = segment_values(segment)
+    contents = segment_contents(segment)
     addresses = segment_addresses(segment)
 
-    Hash[values.zip(addresses).map(&:reverse)]
+    Hash[contents.zip(addresses).map(&:reverse)]
   end
 
   def segment_addresses(segment)
