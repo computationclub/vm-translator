@@ -33,7 +33,7 @@ class RamDescription < Struct.new(:hash)
   end
 
   def get_segment_values(segment)
-    get_numeric_values(Array(hash.fetch(segment)))
+    Array(hash.fetch(segment)).map(&method(:value_to_number))
   end
 
   def get_segment_ram(segment, values)
@@ -48,14 +48,12 @@ class RamDescription < Struct.new(:hash)
     SEGMENT_ADDRESS.fetch(segment)
   end
 
-  def get_numeric_values(values)
-    values.map do |value|
-      case value
-      when Numeric
-        value
-      else
-        value ? -1 : 0
-      end
+  def value_to_number(value)
+    case value
+    when Numeric
+      value
+    else
+      value ? -1 : 0
     end
   end
 
