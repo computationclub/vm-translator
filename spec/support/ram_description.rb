@@ -39,7 +39,7 @@ class RamDescription < Struct.new(:hash)
     contents = segment_contents(segment)
     addresses = segment_addresses(segment)
 
-    Hash[contents.zip(addresses).map(&:reverse)]
+    Hash[addresses.zip(contents)]
   end
 
   def segment_contents(segment)
@@ -56,7 +56,10 @@ class RamDescription < Struct.new(:hash)
   end
 
   def segment_addresses(segment)
-    segment_base_address(segment).upto(Float::INFINITY)
+    base_address = segment_base_address(segment)
+    size = segment_contents(segment).length
+
+    base_address...(base_address + size)
   end
 
   def segment_base_address(segment)
