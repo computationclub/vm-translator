@@ -127,6 +127,11 @@ class CodeWriter
         @#{3 + offset}
         D=A
       EOF
+    when 'static'
+      output.puts <<-EOF
+        @STATIC.#{offset}
+        D=A
+      EOF
     else
       output.puts <<-EOF
         // Get base address of the local segment
