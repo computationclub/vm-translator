@@ -66,17 +66,7 @@ class CodeWriter
   def write_push_pop(command, segment, index)
     case command
     when Parser::C_PUSH
-      output.puts <<-EOF
-        // Load index into M[SP]
-        @#{index}
-        D=A
-        @SP
-        A=M
-        M=D
-        // SP++
-        @SP
-        M=M+1
-      EOF
+      write_push(segment, index)
     when Parser::C_POP
       load_base_address_into_r13(segment, index)
       output.puts <<-EOF
@@ -96,6 +86,34 @@ class CodeWriter
   private
 
   attr_reader :output
+
+  def write_push(segment, index)
+    case segment
+    when 'constant'
+      output.puts <<-EOF
+        // Load index into M[SP]
+        @#{index}
+        D=A
+      EOF
+    when 'local'
+      load_base_address_into_r13(segment, index)
+      output.puts <<-EOF
+        @R13
+        A=M
+        D=M
+      EOF
+    end
+
+    output.puts <<-EOF
+      // RAM[SP]=D
+      @SP
+      A=M
+      M=D
+      // SP++
+      @SP
+      M=M+1
+    EOF
+  end
 
   def load_base_address_into_r13(segment, offset)
     if segment == 'temp'
