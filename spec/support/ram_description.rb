@@ -66,17 +66,17 @@ class RamDescription < Struct.new(:hash)
   def segment_pointer_ram(segment)
     case segment
     when :stack, :local, :argument, :this, :that
-      { POINTER_ADDRESS.fetch(segment) => pointer_address(segment) }
+      { POINTER_ADDRESS.fetch(segment) => segment_pointer_address(segment) }
     else
       {}
     end
   end
 
-  def pointer_address(segment)
-    segment_base_address(segment) + pointer_offset(segment)
+  def segment_pointer_address(segment)
+    segment_base_address(segment) + segment_pointer_offset(segment)
   end
 
-  def pointer_offset(segment)
+  def segment_pointer_offset(segment)
     case segment
     when :stack
       Array(hash.fetch(:stack, [])).length
