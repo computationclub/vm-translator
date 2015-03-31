@@ -116,9 +116,15 @@ class CodeWriter
   end
 
   def load_base_address_into_r13(segment, offset)
-    if segment == 'temp'
+    case segment
+    when 'temp'
       output.puts <<-EOF
         @#{5 + offset}
+        D=A
+      EOF
+    when 'pointer'
+      output.puts <<-EOF
+        @#{3 + offset}
         D=A
       EOF
     else
