@@ -56,10 +56,10 @@ class RamDescription < Struct.new(:hash)
   end
 
   def segment_addresses(segment)
-    segment_address(segment).upto(Float::INFINITY)
+    segment_base_address(segment).upto(Float::INFINITY)
   end
 
-  def segment_address(segment)
+  def segment_base_address(segment)
     SEGMENT_ADDRESS.fetch(segment)
   end
 
@@ -73,7 +73,7 @@ class RamDescription < Struct.new(:hash)
   end
 
   def pointer_address(segment)
-    segment_address(segment) + pointer_offset(segment)
+    segment_base_address(segment) + pointer_offset(segment)
   end
 
   def pointer_offset(segment)
