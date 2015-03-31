@@ -120,7 +120,8 @@ class CodeWriter
     {
       'local'    => 'LCL',
       'argument' => 'ARG',
-      'this'     => 'THIS'
+      'this'     => 'THIS',
+      'that'     => 'THAT'
     }.fetch(segment)
   end
 
