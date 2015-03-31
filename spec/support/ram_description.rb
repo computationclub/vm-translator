@@ -26,7 +26,7 @@ class RamDescription < Struct.new(:hash)
 
   def ram_from_segment_values(segment)
     segment_ram = get_segment_contents_ram(segment)
-    pointer_ram = get_pointer_ram(segment)
+    pointer_ram = get_segment_pointer_ram(segment)
 
     pointer_ram.merge(segment_ram)
   end
@@ -59,7 +59,7 @@ class RamDescription < Struct.new(:hash)
     end
   end
 
-  def get_pointer_ram(segment)
+  def get_segment_pointer_ram(segment)
     case segment
     when :stack, :local, :argument, :this, :that
       { POINTER_ADDRESS.fetch(segment) => get_pointer_address(segment) }
