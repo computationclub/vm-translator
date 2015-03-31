@@ -78,16 +78,8 @@ class CodeWriter
         M=M+1
       EOF
     when Parser::C_POP
+      load_base_address_into_r13(segment, index)
       output.puts <<-EOF
-        // Get base address of the local segment
-        @#{base_address(segment)} // A=1
-        D=M         // D=RAM[1]=300
-        // Add the index offset to the base address
-        @#{index}   // A=2
-        D=A+D       // D=302
-        // Store the destination in R13
-        @R13        // A=13
-        M=D         // RAM[13]=302
         // SP--
         @SP         // A=0
         AM=M-1      // A,RAM[0]=RAM[0]-1=257
@@ -104,6 +96,35 @@ class CodeWriter
   private
 
   attr_reader :output
+
+  def load_base_address_into_r13(segment, offset)
+    if segment == 'temp'
+      output.puts <<-EOF
+        @#{5 + offset}
+        D=A
+      EOF
+    else
+      output.puts <<-EOF
+        // Get base address of the local segment
+        @#{base_address(segment)} // A=1
+        D=M         // D=RAM[1]=300
+      EOF
+
+      if offset > 0
+        output.puts <<-EOF
+          // Add the index offset to the base address
+          @#{offset}   // A=2
+          D=A+D        // D=302
+        EOF
+      end
+    end
+
+    output.puts <<-EOF
+      // Store the destination in R13
+      @R13        // A=13
+      M=D         // RAM[13]=302
+    EOF
+  end
 
   def operand(command)
     {
