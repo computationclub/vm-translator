@@ -7,6 +7,10 @@ class CodeWriter
   def set_file_name(filename)
   end
 
+  def close
+    output.close
+  end
+
   def write_arithmetic(command)
     case command
     when 'add', 'sub', 'and', 'or'
