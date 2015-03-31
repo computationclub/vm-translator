@@ -19,7 +19,7 @@ class RamDescription < Struct.new(:hash)
   }
 
   def to_ram
-    segments.map { |segment| get_segment_ram(segment) }.inject({}, :merge)
+    segments.map { |segment| segment_ram(segment) }.inject({}, :merge)
   end
 
   private
@@ -28,29 +28,29 @@ class RamDescription < Struct.new(:hash)
     hash.keys
   end
 
-  def get_segment_ram(segment)
-    segment_ram = get_segment_contents_ram(segment)
-    pointer_ram = get_segment_pointer_ram(segment)
+  def segment_ram(segment)
+    segment_ram = segment_contents_ram(segment)
+    pointer_ram = segment_pointer_ram(segment)
 
     pointer_ram.merge(segment_ram)
   end
 
-  def get_segment_values(segment)
+  def segment_values(segment)
     Array(hash.fetch(segment)).map(&method(:value_to_number))
   end
 
-  def get_segment_contents_ram(segment)
-    values = get_segment_values(segment)
-    addresses = get_segment_addresses(segment)
+  def segment_contents_ram(segment)
+    values = segment_values(segment)
+    addresses = segment_addresses(segment)
 
     Hash[values.zip(addresses).map(&:reverse)]
   end
 
-  def get_segment_addresses(segment)
-    get_segment_address(segment).upto(Float::INFINITY)
+  def segment_addresses(segment)
+    segment_address(segment).upto(Float::INFINITY)
   end
 
-  def get_segment_address(segment)
+  def segment_address(segment)
     SEGMENT_ADDRESS.fetch(segment)
   end
 
@@ -63,20 +63,20 @@ class RamDescription < Struct.new(:hash)
     end
   end
 
-  def get_segment_pointer_ram(segment)
+  def segment_pointer_ram(segment)
     case segment
     when :stack, :local, :argument, :this, :that
-      { POINTER_ADDRESS.fetch(segment) => get_pointer_address(segment) }
+      { POINTER_ADDRESS.fetch(segment) => pointer_address(segment) }
     else
       {}
     end
   end
 
-  def get_pointer_address(segment)
-    get_segment_address(segment) + get_pointer_offset(segment)
+  def pointer_address(segment)
+    segment_address(segment) + pointer_offset(segment)
   end
 
-  def get_pointer_offset(segment)
+  def pointer_offset(segment)
     case segment
     when :stack
       Array(hash.fetch(:stack, [])).length
