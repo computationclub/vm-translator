@@ -64,17 +64,41 @@ class CodeWriter
   end
 
   def write_push_pop(command, segment, index)
-    output.puts <<-EOF
-      // Load index into M[SP]
-      @#{index}
-      D=A
-      @SP
-      A=M
-      M=D
-      // SP++
-      @SP
-      M=M+1
-    EOF
+    case command
+    when Parser::C_PUSH
+      output.puts <<-EOF
+        // Load index into M[SP]
+        @#{index}
+        D=A
+        @SP
+        A=M
+        M=D
+        // SP++
+        @SP
+        M=M+1
+      EOF
+    when Parser::C_POP
+      output.puts <<-EOF
+        // Get base address of the local segment
+        @LCL        // A=1
+        D=M         // D=RAM[1]=300
+        // Add the index offset to the base address
+        @#{index}   // A=2
+        D=A+D       // D=302
+        // Store the destination in R13
+        @R13        // A=13
+        M=D         // RAM[13]=302
+        // SP--
+        @SP         // A=0
+        AM=M-1      // A,RAM[0]=RAM[0]-1=257
+        // D = RAM[A] = the value to pop from the stack
+        D=M         // D=RAM[257]=23
+        // RAM[302] = 23
+        @R13        // A=13
+        A=M         // A=RAM[13]=302
+        M=D         // RAM[302]=23
+      EOF
+    end
   end
 
   private
