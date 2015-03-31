@@ -19,16 +19,21 @@ class RamDescription < Struct.new(:hash)
   }
 
   def to_ram
-    hash.map { |segment, values| ram_from_segment_values(segment, Array(values)) }.inject({}, :merge)
+    hash.keys.map { |segment| ram_from_segment_values(segment) }.inject({}, :merge)
   end
 
   private
 
-  def ram_from_segment_values(segment, values)
-    segment_ram = get_segment_ram(segment, get_numeric_values(values))
+  def ram_from_segment_values(segment)
+    values = get_segment_values(segment)
+    segment_ram = get_segment_ram(segment, values)
     pointer_ram = get_pointer_ram(segment)
 
     pointer_ram.merge(segment_ram)
+  end
+
+  def get_segment_values(segment)
+    get_numeric_values(Array(hash.fetch(segment)))
   end
 
   def get_segment_ram(segment, values)
