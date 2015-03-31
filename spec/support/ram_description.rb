@@ -19,10 +19,14 @@ class RamDescription < Struct.new(:hash)
   }
 
   def to_ram
-    hash.keys.map { |segment| get_segment_ram(segment) }.inject({}, :merge)
+    segments.map { |segment| get_segment_ram(segment) }.inject({}, :merge)
   end
 
   private
+
+  def segments
+    hash.keys
+  end
 
   def get_segment_ram(segment)
     segment_ram = get_segment_contents_ram(segment)
