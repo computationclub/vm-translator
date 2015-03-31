@@ -7,7 +7,7 @@ class RamDescription < Struct.new(:hash)
     that:     4
   }
 
-  DEFAULT_SEGMENT_BASE_ADDRESS = {
+  DEFAULT_SEGMENT_POINTER = {
     temp:     5,
     static:   16,
     stack:    256,
@@ -63,7 +63,7 @@ class RamDescription < Struct.new(:hash)
   end
 
   def segment_base_address(segment)
-    DEFAULT_SEGMENT_BASE_ADDRESS.fetch(segment)
+    segment_pointer_address(segment) - segment_pointer_offset(segment)
   end
 
   def segment_pointer_ram(segment)
@@ -76,7 +76,7 @@ class RamDescription < Struct.new(:hash)
   end
 
   def segment_pointer_address(segment)
-    segment_base_address(segment) + segment_pointer_offset(segment)
+    DEFAULT_SEGMENT_POINTER.fetch(segment) + segment_pointer_offset(segment)
   end
 
   def segment_pointer_offset(segment)
