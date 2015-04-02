@@ -9,6 +9,9 @@ class RamDescription < Struct.new(:hash)
 
   DEFAULT_SEGMENT_POINTER = {
     temp:     5,
+    r13:      13,
+    r14:      14,
+    r15:      15,
     static:   16,
     stack:    256,
     local:    300,
