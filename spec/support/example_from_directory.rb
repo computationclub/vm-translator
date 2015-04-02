@@ -3,6 +3,7 @@ require 'pathname'
 
 class ExampleFromDirectory
   SCRIPT_EXT, INPUT_EXT = '.tst', '.vm'
+  PENDING_FILENAME = '.pending'
 
   def initialize(pathname)
     self.pathname = pathname
@@ -26,6 +27,10 @@ class ExampleFromDirectory
 
   def expected_pathname
     pathname + expected_filename
+  end
+
+  def pending?
+    File.exist?(pathname + PENDING_FILENAME)
   end
 
   def copy_into(destination)
