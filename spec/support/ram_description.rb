@@ -74,8 +74,7 @@ class RamDescription < Struct.new(:hash)
   end
 
   def segment_pointer_ram(segment)
-    case segment
-    when :stack, :local, :argument, :this, :that
+    if SEGMENT_POINTER_ADDRESS.has_key?(segment)
       { SEGMENT_POINTER_ADDRESS.fetch(segment) => segment_pointer_address(segment) }
     else
       {}
