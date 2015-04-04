@@ -33,6 +33,10 @@ class ExampleFromDirectory
     File.exist?(pathname + PENDING_FILENAME)
   end
 
+  def requires_init?
+    input_pathnames.length > 1
+  end
+
   def copy_into(destination)
     FileUtils.cp_r pathname, destination
     self.class.new(Pathname.new(destination) + base_filename)
