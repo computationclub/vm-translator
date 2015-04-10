@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/computationclub/vm-translator.svg?branch=master)](https://travis-ci.org/computationclub/vm-translator)
 
-This is a Ruby implementation of a translator from VM code to Hack assembly language. The source VM language and the design of this translator are described in [chapter seven](http://nand2tetris.org/lectures/PDF/lecture%2007%20virtual%20machine%20I.pdf) of “[The Elements of Computing Systems](http://nand2tetris.org/)”, and the target assembly language is described in [chapter four](http://nand2tetris.org/chapters/chapter%2004.pdf).
+This is a Ruby implementation of a translator from VM code to Hack assembly language. The source VM language and the design of this translator are described in chapters [seven](http://nand2tetris.org/lectures/PDF/lecture%2007%20virtual%20machine%20I.pdf) and [eight](http://nand2tetris.org/lectures/PDF/lecture%2008%20virtual%20machine%20II.pdf) of “[The Elements of Computing Systems](http://nand2tetris.org/)”, and the target assembly language is described in [chapter four](http://nand2tetris.org/chapters/chapter%2004.pdf).
 
 ## Running
 
@@ -39,7 +39,7 @@ M=M+D
 
 Both unit and acceptance tests are provided.
 
-The unit tests verify that each module (`Parser` and `CodeWriter`) implements the API described in chapter seven. To run them, use `bundle exec rspec spec/unit`.
+The unit tests verify that each module (`Parser` and `CodeWriter`) implements the API described in chapters seven and eight. To run them, use `bundle exec rspec spec/unit`.
 
 The acceptance tests run `bin/translator` against each [example VM program](spec/acceptance/examples) and check the emulated behaviour of its output. To run them, use `bundle exec rspec spec/acceptance`.
 
