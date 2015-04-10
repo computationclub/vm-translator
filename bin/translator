@@ -3,6 +3,10 @@
 require_relative '../lib/parser'
 require_relative '../lib/code_writer'
 
+options = [].tap do |options|
+  options << ARGV.shift while ARGV.first.start_with?('--')
+end
+
 input = ARGF.read
 parser = Parser.new(input)
 code_writer = CodeWriter.new(STDOUT)

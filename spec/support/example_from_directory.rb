@@ -9,8 +9,8 @@ class ExampleFromDirectory
     self.pathname = pathname
   end
 
-  def input_pathname
-    base_pathname.sub_ext(INPUT_EXT)
+  def input_pathnames
+    Pathname.glob(pathname + "*#{INPUT_EXT}")
   end
 
   def output_pathname
@@ -31,6 +31,10 @@ class ExampleFromDirectory
 
   def pending?
     File.exist?(pathname + PENDING_FILENAME)
+  end
+
+  def requires_init?
+    input_pathnames.length > 1
   end
 
   def copy_into(destination)
