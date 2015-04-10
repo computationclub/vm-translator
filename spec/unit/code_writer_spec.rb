@@ -118,6 +118,26 @@ RSpec.describe CodeWriter do
     end
   end
 
+  describe 'modularity' do
+    include EmulationHelper
+    include RamMatchers
+
+    context 'for conditionals' do
+      before(:example) do
+        code_writer.write_push_pop Parser::C_PUSH, 'constant', 1
+        code_writer.write_push_pop Parser::C_PUSH, 'constant', 2
+        code_writer.write_arithmetic 'eq'
+
+        code_writer.write_push_pop Parser::C_PUSH, 'constant', 0
+        code_writer.write_arithmetic 'eq'
+      end
+
+      it 'writes assembly that uses independent control flow for each conditional' do
+        expect(emulation_of(assembly)).to change_ram.from(stack: []).to(stack: -1)
+      end
+    end
+  end
+
   describe '#close' do
     it 'closes the output' do
       expect(output).to receive(:close)
