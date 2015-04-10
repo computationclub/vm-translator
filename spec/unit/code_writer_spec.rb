@@ -1,6 +1,10 @@
 require 'code_writer'
 require 'parser'
 require 'stringio'
+require 'support/control_flow_detector'
+require 'support/function_lifetime'
+require 'support/stack_frame'
+require 'support/helpers/assembly_helper'
 require 'support/helpers/emulation_helper'
 require 'support/matchers/ram_matchers'
 
@@ -118,6 +122,224 @@ RSpec.describe CodeWriter do
     end
   end
 
+  describe '#write_init' do
+    include EmulationHelper
+    include RamMatchers
+
+    let(:frame) { StackFrame.new(pointers: { stack: 256 }) }
+    let(:lifetime) { FunctionLifetime.new(frame: frame) }
+    let(:frame_after) { lifetime.frame_after_call_command }
+    let(:pointers_after) { frame_after.pointers }
+
+    let(:detector) { ControlFlowDetector.new(output) }
+
+    before(:example) do
+      detector.detect_jump('Sys.init') do
+        code_writer.write_init
+      end
+    end
+
+    it 'writes assembly to initialise the stack pointer', :pending do
+      expect(emulation_of(assembly)).to change_ram.
+        from({}).to(pointers: { stack: pointers_after[:stack] })
+    end
+
+    it 'writes assembly to transfer control to system init function', :pending do
+      expect(emulation_of(assembly)).to change_ram.from({}).to(detector.success)
+    end
+  end
+
+  describe '#write_label' do
+    include EmulationHelper
+    include RamMatchers
+
+    let(:label) { 'myLabel' }
+    let(:detector) { ControlFlowDetector.new(output) }
+
+    before(:example) do
+      detector.detect_label(label) do
+        code_writer.write_label label
+      end
+    end
+
+    it 'writes assembly to insert a label', :pending do
+      expect(emulation_of(assembly)).to change_ram.from({}).to(detector.success)
+    end
+  end
+
+  describe '#write_goto' do
+    include EmulationHelper
+    include RamMatchers
+
+    let(:label) { 'myLabel' }
+    let(:detector) { ControlFlowDetector.new(output) }
+
+    before(:example) do
+      detector.detect_goto(label) do
+        code_writer.write_goto label
+      end
+    end
+
+    it 'writes assembly to perform a jump', :pending do
+      expect(emulation_of(assembly)).to change_ram.from({}).to(detector.success)
+    end
+  end
+
+  describe '#write_if' do
+    include EmulationHelper
+    include RamMatchers
+
+    let(:label) { 'myLabel' }
+    let(:detector) { ControlFlowDetector.new(output) }
+
+    before(:example) do
+      detector.detect_goto(label) do
+        code_writer.write_if label
+      end
+    end
+
+    context 'when the stack’s top element is non-zero' do
+      it 'writes assembly to pop a value from the stack', :pending do
+        expect(emulation_of(assembly)).to change_ram.from(stack: [2, 5]).to(stack: [2])
+      end
+
+      it 'writes assembly to perform a jump', :pending do
+        expect(emulation_of(assembly)).to change_ram.from(stack: [2, 5]).to(detector.success)
+      end
+    end
+
+    context 'when the stack’s top element is zero' do
+      it 'writes assembly to pop a value from the stack', :pending do
+        expect(emulation_of(assembly)).to change_ram.from(stack: [2, 0]).to(stack: [2])
+      end
+
+      it 'writes assembly to not perform a jump', :pending do
+        expect(emulation_of(assembly)).not_to change_ram.from(stack: [2, 0]).to(detector.success)
+      end
+    end
+  end
+
+  describe '#write_call' do
+    include EmulationHelper
+    include RamMatchers
+
+    let(:function_name) { 'myFunction' }
+    let(:arguments) { [1234, 47] }
+
+    let(:frame) {
+      StackFrame.new(
+        lengths:  { local: 5 },
+        pointers: { stack: 310, this: 3010, that: 4010 }
+      )
+    }
+    let(:lifetime) {
+      FunctionLifetime.new(
+        frame: frame,
+        lengths: { argument: arguments.length }
+      )
+    }
+    let(:frame_before) { lifetime.frame_after_arguments }
+    let(:frame_after) { lifetime.frame_after_call_command }
+
+    let(:ram_before) { { pointers: frame_before.pointers, stack: arguments } }
+    let(:pointers_after) { frame_after.pointers }
+    let(:saved_pointers_ram) { frame_after.saved_pointers_ram }
+
+    let(:detector) { ControlFlowDetector.new(output) }
+
+    before(:example) do
+      detector.detect_jump(function_name) do
+        code_writer.write_call function_name, arguments.length
+      end
+    end
+
+    it 'writes assembly to preserve the caller’s segment pointers', :pending do
+      expect(emulation_of(assembly)).to change_ram.from(ram_before).to(saved_pointers_ram)
+    end
+
+    it 'writes assembly to set up the callee’s local, argument and stack segment pointers', :pending do
+      expect(emulation_of(assembly)).to change_ram.from(ram_before).to(pointers: pointers_after)
+    end
+
+    it 'writes assembly to expose the arguments to the callee', :pending do
+      expect(emulation_of(assembly)).to change_ram.from(ram_before).to(
+        pointers: { argument: pointers_after[:argument] },
+        argument: arguments
+      )
+    end
+
+    it 'writes assembly to transfer control to the callee', :pending do
+      expect(emulation_of(assembly)).to change_ram.from(ram_before).to(detector.success)
+    end
+  end
+
+  describe '#write_return' do
+    include EmulationHelper
+    include RamMatchers
+
+    let(:arguments) { [1234, 47] }
+    let(:return_value) { 1196 }
+
+    let(:frame) {
+      StackFrame.new(
+        lengths:  { local: 5 },
+        pointers: { stack: 310, this: 3010, that: 4010 }
+      )
+    }
+    let(:lifetime) {
+      FunctionLifetime.new(
+        frame: frame,
+        lengths: { argument: arguments.length, local: 3 },
+        pointers: { this: 3000, that: 4000 }
+      )
+    }
+    let(:frame_before) { lifetime.frame_after_body }
+    let(:frame_after) { lifetime.frame_after_return_command }
+
+    let(:ram_before) { { pointers: frame_before.pointers, stack: [return_value] }.merge(saved_pointers_ram) }
+    let(:pointers_after) { frame_after.pointers }
+    let(:saved_pointers_ram) { frame_before.saved_pointers_ram }
+
+    let(:detector) { ControlFlowDetector.new(output) }
+
+    before(:example) do
+      detector.detect_return(frame_before) do
+        code_writer.write_return
+      end
+    end
+
+    it 'writes assembly to restore the caller’s local, argument, this, that and stack segment pointers', :pending do
+      expect(emulation_of(assembly)).to change_ram.from(ram_before).to(pointers: pointers_after)
+    end
+
+    it 'writes assembly to expose the return value to the caller', :pending do
+      expect(emulation_of(assembly)).to change_ram.from(ram_before).to(
+        pointers: { stack: pointers_after[:stack] },
+        stack: return_value
+      )
+    end
+
+    it 'writes assembly to return control to the caller', :pending do
+      expect(emulation_of(assembly)).to change_ram.from(ram_before).to(detector.success)
+    end
+  end
+
+  describe '#write_function' do
+    include EmulationHelper
+    include RamMatchers
+
+    let(:function_name) { 'myFunction' }
+    let(:num_locals) { 3 }
+
+    before(:example) do
+      code_writer.write_function function_name, num_locals
+    end
+
+    it 'writes assembly to initialise the local variables', :pending do
+      expect(emulation_of(assembly)).to change_ram.from(stack: [2, 3]).to(stack: [2, 3, 0, 0, 0])
+    end
+  end
+
   describe 'modularity' do
     include EmulationHelper
     include RamMatchers
@@ -134,6 +356,84 @@ RSpec.describe CodeWriter do
 
       it 'writes assembly that uses independent control flow for each conditional' do
         expect(emulation_of(assembly)).to change_ram.from(stack: []).to(stack: -1)
+      end
+    end
+
+    context 'for static variables' do
+      before(:example) do
+        code_writer.set_file_name 'first'
+        code_writer.write_push_pop Parser::C_PUSH, 'constant', 10
+        code_writer.write_push_pop Parser::C_POP, 'static', 0
+        code_writer.write_push_pop Parser::C_PUSH, 'constant', 20
+        code_writer.write_push_pop Parser::C_POP, 'static', 1
+
+        code_writer.set_file_name 'second'
+        code_writer.write_push_pop Parser::C_PUSH, 'constant', 30
+        code_writer.write_push_pop Parser::C_POP, 'static', 0
+        code_writer.write_push_pop Parser::C_PUSH, 'constant', 40
+        code_writer.write_push_pop Parser::C_POP, 'static', 1
+
+        code_writer.set_file_name 'first'
+        code_writer.write_push_pop Parser::C_PUSH, 'static', 0
+        code_writer.write_push_pop Parser::C_PUSH, 'static', 1
+      end
+
+      it 'writes assembly that uses independent static variables for each file', :pending do
+        expect(emulation_of(assembly)).to change_ram.from(stack: []).to(stack: [10, 20])
+      end
+    end
+
+    context 'for return addresses' do
+      include AssemblyHelper
+
+      before(:example) do
+        code_writer.write_push_pop Parser::C_PUSH, 'constant', 1
+        code_writer.write_call 'function', 0
+        code_writer.write_push_pop Parser::C_PUSH, 'constant', 2
+        code_writer.write_call 'function', 0
+        code_writer.write_push_pop Parser::C_PUSH, 'constant', 3
+
+        output.write finish_code
+
+        code_writer.write_function 'function', 0
+        code_writer.write_push_pop Parser::C_PUSH, 'constant', 10
+        code_writer.write_return
+      end
+
+      it 'writes assembly that uses an independent return address for each call', :pending do
+        expect(emulation_of(assembly)).to change_ram.from(stack: []).to(stack: [1, 10, 2, 10, 3])
+      end
+    end
+
+    context 'for labels' do
+      include AssemblyHelper
+
+      before(:example) do
+        code_writer.write_call 'first', 0
+        code_writer.write_call 'second', 0
+
+        output.write finish_code
+
+        code_writer.write_function 'first', 0
+        code_writer.write_goto 'label'
+        code_writer.write_push_pop Parser::C_PUSH, 'constant', 10
+        code_writer.write_return
+        code_writer.write_label 'label'
+        code_writer.write_push_pop Parser::C_PUSH, 'constant', 20
+        code_writer.write_return
+
+        code_writer.write_function 'second', 0
+        code_writer.write_push_pop Parser::C_PUSH, 'constant', -1
+        code_writer.write_if 'label'
+        code_writer.write_push_pop Parser::C_PUSH, 'constant', 30
+        code_writer.write_return
+        code_writer.write_label 'label'
+        code_writer.write_push_pop Parser::C_PUSH, 'constant', 40
+        code_writer.write_return
+      end
+
+      it 'writes assembly that uses independent labels for each function', :pending do
+        expect(emulation_of(assembly)).to change_ram.from(stack: []).to(stack: [20, 40])
       end
     end
   end
