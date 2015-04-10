@@ -11,7 +11,7 @@ RSpec.describe 'the translator' do
 
   ExampleFromDirectory.all_in(EXAMPLES_PATH).each do |example|
     it "generates a #{example.output_pathname.basename} file which satisfies #{example.script_pathname.basename}", pending: example.pending? do
-      output, error, status = Open3.capture3(TRANSLATOR_PATH, example.input_pathname.to_path)
+      output, error, status = Open3.capture3(TRANSLATOR_PATH, *example.input_pathnames.map(&:to_path))
       expect(error).to be_empty
       expect(status).to be_success
       expect(output).not_to be_empty

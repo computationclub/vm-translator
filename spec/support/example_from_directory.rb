@@ -9,8 +9,8 @@ class ExampleFromDirectory
     self.pathname = pathname
   end
 
-  def input_pathname
-    base_pathname.sub_ext(INPUT_EXT)
+  def input_pathnames
+    Pathname.glob(pathname + "*#{INPUT_EXT}")
   end
 
   def output_pathname
