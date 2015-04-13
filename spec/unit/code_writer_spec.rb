@@ -444,8 +444,7 @@ RSpec.describe CodeWriter do
         code_writer.write_return
 
         code_writer.write_function 'second', 0
-        code_writer.write_push_pop Parser::C_PUSH, 'constant', -1
-        code_writer.write_if 'label'
+        code_writer.write_goto 'label'
         code_writer.write_push_pop Parser::C_PUSH, 'constant', 30
         code_writer.write_return
         code_writer.write_label 'label'
