@@ -331,12 +331,33 @@ RSpec.describe CodeWriter do
     let(:function_name) { 'myFunction' }
     let(:num_locals) { 3 }
 
+    let(:frame) { StackFrame.new(pointers: { stack: 310 }) }
+    let(:lifetime) {
+      FunctionLifetime.new(
+        frame: frame,
+        lengths: { local: num_locals }
+      )
+    }
+    let(:frame_before) { lifetime.frame_after_call_command }
+    let(:frame_after) { lifetime.frame_after_function_command }
+
+    let(:ram_before) { { pointers: frame_before.pointers } }
+    let(:pointers_after) { frame_after.pointers }
+
     before(:example) do
       code_writer.write_function function_name, num_locals
     end
 
-    it 'writes assembly to initialise the local variables', :pending do
-      expect(emulation_of(assembly)).to change_ram.from(stack: [2, 3]).to(stack: [2, 3, 0, 0, 0])
+    it 'writes assembly to set up the callee’s local variables', :pending do
+      expect(emulation_of(assembly)).to change_ram.from(ram_before).to(
+        pointers: { local: pointers_after[:local] },
+        local: num_locals.times.map { 0 }
+      )
+    end
+
+    it 'writes assembly to move the callee’s stack pointer past its local variables', :pending do
+      expect(emulation_of(assembly)).to change_ram.
+        from(ram_before).to(pointers: { stack: pointers_after[:stack] })
     end
   end
 
