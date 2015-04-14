@@ -109,6 +109,76 @@ class CodeWriter
     end
   end
 
+  def write_return
+    output.puts <<-EOF
+      // FRAME = LCL
+      @LCL
+      D=M     // D=RAM[LCL]
+      @FRAME
+      M=D     // RAM[FRAME]=D=RAM[LCL]
+
+      // RET = *(FRAME - 5)
+      @5
+      A=D-A   // A=RAM[FRAME]-5
+      D=M     // D=RAM[RAM[FRAME]-5]
+      @RET
+      M=D     // RAM[RET]=RAM[RAM[FRAME]-5]
+    EOF
+
+    # *ARG = pop()
+    pop_stack_into_d
+    output.puts <<-EOF
+      @ARG
+      A=M     // A=RAM[ARG]
+      M=D     // RAM[RAM[ARG]] = pop()
+
+      // SP = ARG+1
+      @ARG
+      D=M+1
+      @SP
+      M=D
+
+      // THAT = *(FRAME - 1)
+      @FRAME
+      A=M-1   // A=RAM[FRAME-1]
+      D=M     // D=RAM[RAM[FRAME-1]]
+      @THAT
+      M=D     // RAM[THAT]=RAM[RAM[FRAME-1]]
+
+      // THIS = *(FRAME - 2)
+      @FRAME
+      A=M-1
+      A=A-1
+      D=M
+      @THIS
+      M=D
+
+      // ARG = *(FRAME - 3)
+      @FRAME
+      A=M-1
+      A=A-1
+      A=A-1
+      D=M
+      @ARG
+      M=D
+
+      // LCL = *(FRAME - 4)
+      @FRAME
+      A=M-1
+      A=A-1
+      A=A-1
+      A=A-1
+      D=M
+      @LCL
+      M=D
+
+      // goto RET
+      @RET
+      A=M
+      0;JMP
+    EOF
+  end
+
   private
 
   attr_reader :output

@@ -308,18 +308,18 @@ RSpec.describe CodeWriter do
       end
     end
 
-    it 'writes assembly to restore the caller’s local, argument, this, that and stack segment pointers', :pending do
+    it 'writes assembly to restore the caller’s local, argument, this, that and stack segment pointers' do
       expect(emulation_of(assembly)).to change_ram.from(ram_before).to(pointers: pointers_after)
     end
 
-    it 'writes assembly to expose the return value to the caller', :pending do
+    it 'writes assembly to expose the return value to the caller' do
       expect(emulation_of(assembly)).to change_ram.from(ram_before).to(
         pointers: { stack: pointers_after[:stack] },
         stack: return_value
       )
     end
 
-    it 'writes assembly to return control to the caller', :pending do
+    it 'writes assembly to return control to the caller' do
       expect(emulation_of(assembly)).to change_ram.from(ram_before).to(detector.success)
     end
   end
