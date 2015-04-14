@@ -199,21 +199,21 @@ RSpec.describe CodeWriter do
     end
 
     context 'when the stack’s top element is non-zero' do
-      it 'writes assembly to pop a value from the stack', :pending do
+      it 'writes assembly to pop a value from the stack' do
         expect(emulation_of(assembly)).to change_ram.from(stack: [2, 5]).to(stack: [2])
       end
 
-      it 'writes assembly to perform a jump', :pending do
+      it 'writes assembly to perform a jump' do
         expect(emulation_of(assembly)).to change_ram.from(stack: [2, 5]).to(detector.success)
       end
     end
 
     context 'when the stack’s top element is zero' do
-      it 'writes assembly to pop a value from the stack', :pending do
+      it 'writes assembly to pop a value from the stack' do
         expect(emulation_of(assembly)).to change_ram.from(stack: [2, 0]).to(stack: [2])
       end
 
-      it 'writes assembly to not perform a jump', :pending do
+      it 'writes assembly to not perform a jump' do
         expect(emulation_of(assembly)).not_to change_ram.from(stack: [2, 0]).to(detector.success)
       end
     end

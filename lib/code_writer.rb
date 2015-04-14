@@ -73,22 +73,26 @@ class CodeWriter
       write_push(segment, index)
     when Parser::C_POP
       load_base_address_into_r13(segment, index)
+      pop_stack_into_d
       output.puts <<-EOF
-        // SP--
-        @SP         // A=0
-        AM=M-1      // A,RAM[0]=RAM[0]-1=257
-        // D = RAM[A] = the value to pop from the stack
-        D=M         // D=RAM[257]=23
-        // RAM[302] = 23
-        @R13        // A=13
-        A=M         // A=RAM[13]=302
-        M=D         // RAM[302]=23
+        @R13
+        A=M
+        M=D
       EOF
     end
   end
 
   def write_label(label)
     output.puts "($#{label})"
+  end
+
+  def write_if(label)
+    pop_stack_into_d
+    output.puts <<-EOF
+      // Jump to the label's address if D is nonzero
+      @$#{label}
+      D;JNE
+    EOF
   end
 
   private
@@ -130,6 +134,14 @@ class CodeWriter
       // Store the destination in R13
       @R13        // A=13
       M=D         // RAM[13]=302
+    EOF
+  end
+
+  def pop_stack_into_d
+    output.puts <<-EOF
+      @SP
+      AM=M-1
+      D=M
     EOF
   end
 
