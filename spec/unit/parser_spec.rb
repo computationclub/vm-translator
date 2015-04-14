@@ -172,7 +172,7 @@ RSpec.describe Parser do
       context "when the current command is #{command}" do
         let(:input) { command }
 
-        it "returns #{type}", pending: [:C_LABEL, :C_GOTO, :C_IF, :C_FUNCTION, :C_CALL, :C_RETURN].include?(type) do
+        it "returns #{type}", pending: [:C_FUNCTION, :C_CALL, :C_RETURN].include?(type) do
           expect(parser.command_type).to eq Parser.const_get(type)
         end
       end

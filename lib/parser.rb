@@ -2,6 +2,9 @@ class Parser
   C_ARITHMETIC = Object.new
   C_POP = Object.new
   C_PUSH = Object.new
+  C_LABEL = Object.new
+  C_GOTO = Object.new
+  C_IF = Object.new
 
   def initialize(input)
     @lines = split_lines(input)
@@ -16,10 +19,17 @@ class Parser
   end
 
   def command_type
-    if current.start_with? 'pop'
+    case current.split(' ').first
+    when 'pop'
       C_POP
-    elsif current.start_with? 'push'
+    when 'push'
       C_PUSH
+    when 'label'
+      C_LABEL
+    when 'goto'
+      C_GOTO
+    when 'if-goto'
+      C_IF
     else
       C_ARITHMETIC
     end
