@@ -421,7 +421,7 @@ RSpec.describe CodeWriter do
         code_writer.write_return
       end
 
-      it 'writes assembly that uses an independent return address for each call', :pending do
+      it 'writes assembly that uses an independent return address for each call' do
         expect(emulation_of(assembly)).to change_ram.from(stack: []).to(stack: [1, 10, 2, 10, 3])
       end
     end
