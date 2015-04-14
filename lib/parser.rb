@@ -5,6 +5,8 @@ class Parser
   C_LABEL = Object.new
   C_GOTO = Object.new
   C_IF = Object.new
+  C_FUNCTION = Object.new
+  C_RETURN = Object.new
 
   def initialize(input)
     @lines = split_lines(input)
@@ -30,6 +32,10 @@ class Parser
       C_GOTO
     when 'if-goto'
       C_IF
+    when 'function'
+      C_FUNCTION
+    when 'return'
+      C_RETURN
     else
       C_ARITHMETIC
     end
