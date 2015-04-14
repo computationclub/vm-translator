@@ -23,5 +23,9 @@ while parser.has_more_commands?
       parser.arg1,
       parser.arg2
     )
+  when Parser::C_LABEL
+    code_writer.write_label(parser.arg1)
+  when Parser::C_IF
+    code_writer.write_if(parser.arg1)
   end
 end
