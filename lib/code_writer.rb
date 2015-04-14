@@ -87,6 +87,10 @@ class CodeWriter
     end
   end
 
+  def write_label(label)
+    output.puts "($#{label})"
+  end
+
   private
 
   attr_reader :output

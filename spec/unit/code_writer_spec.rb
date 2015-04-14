@@ -162,7 +162,7 @@ RSpec.describe CodeWriter do
       end
     end
 
-    it 'writes assembly to insert a label', :pending do
+    it 'writes assembly to insert a label' do
       expect(emulation_of(assembly)).to change_ram.from({}).to(detector.success)
     end
   end
