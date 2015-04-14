@@ -211,7 +211,7 @@ RSpec.describe Parser do
     context 'when the current command is a label' do
       let(:input) { 'label LOOP_START' }
 
-      it 'returns the first argument', :pending do
+      it 'returns the first argument' do
         expect(parser.arg1).to eq 'LOOP_START'
       end
     end
@@ -219,7 +219,7 @@ RSpec.describe Parser do
     context 'when the current command is a goto' do
       let(:input) { 'goto WHILE' }
 
-      it 'returns the first argument', :pending do
+      it 'returns the first argument' do
         expect(parser.arg1).to eq 'WHILE'
       end
     end
@@ -227,7 +227,7 @@ RSpec.describe Parser do
     context 'when the current command is an if-goto' do
       let(:input) { 'if-goto COMPUTE_ELEMENT' }
 
-      it 'returns the first argument', :pending do
+      it 'returns the first argument' do
         expect(parser.arg1).to eq 'COMPUTE_ELEMENT'
       end
     end

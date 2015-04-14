@@ -37,10 +37,10 @@ class Parser
 
   def arg1
     case command_type
-    when C_PUSH, C_POP
-      current.split[1]
-    else
+    when C_ARITHMETIC
       current
+    else
+      current.split[1]
     end
   end
 
