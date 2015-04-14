@@ -6,6 +6,7 @@ class Parser
   C_GOTO = Object.new
   C_IF = Object.new
   C_FUNCTION = Object.new
+  C_CALL = Object.new
   C_RETURN = Object.new
 
   def initialize(input)
@@ -34,6 +35,8 @@ class Parser
       C_IF
     when 'function'
       C_FUNCTION
+    when 'call'
+      C_CALL
     when 'return'
       C_RETURN
     else

@@ -172,7 +172,7 @@ RSpec.describe Parser do
       context "when the current command is #{command}" do
         let(:input) { command }
 
-        it "returns #{type}", pending: [:C_CALL].include?(type) do
+        it "returns #{type}" do
           expect(parser.command_type).to eq Parser.const_get(type)
         end
       end
@@ -243,7 +243,7 @@ RSpec.describe Parser do
     context 'when the current command is a function call' do
       let(:input) { 'call Main.fibonacci 1' }
 
-      it 'returns the first argument', :pending do
+      it 'returns the first argument' do
         expect(parser.arg1).to eq 'Main.fibonacci'
       end
     end
