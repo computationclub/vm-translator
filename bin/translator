@@ -31,6 +31,8 @@ while parser.has_more_commands?
     code_writer.write_if(parser.arg1)
   when Parser::C_FUNCTION
     code_writer.write_function(parser.arg1, parser.arg2)
+  when Parser::C_CALL
+    code_writer.write_call(parser.arg1, parser.arg2)
   when Parser::C_RETURN
     code_writer.write_return
   end
