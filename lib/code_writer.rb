@@ -102,6 +102,13 @@ class CodeWriter
     EOF
   end
 
+  def write_function(function_name, num_locals)
+    output.puts "(#{function_name})"
+    num_locals.times do
+      write_push 'constant', 0
+    end
+  end
+
   private
 
   attr_reader :output

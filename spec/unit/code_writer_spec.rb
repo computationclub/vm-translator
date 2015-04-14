@@ -348,14 +348,14 @@ RSpec.describe CodeWriter do
       code_writer.write_function function_name, num_locals
     end
 
-    it 'writes assembly to set up the callee’s local variables', :pending do
+    it 'writes assembly to set up the callee’s local variables' do
       expect(emulation_of(assembly)).to change_ram.from(ram_before).to(
         pointers: { local: pointers_after[:local] },
         local: num_locals.times.map { 0 }
       )
     end
 
-    it 'writes assembly to move the callee’s stack pointer past its local variables', :pending do
+    it 'writes assembly to move the callee’s stack pointer past its local variables' do
       expect(emulation_of(assembly)).to change_ram.
         from(ram_before).to(pointers: { stack: pointers_after[:stack] })
     end
