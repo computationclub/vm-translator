@@ -180,7 +180,7 @@ RSpec.describe CodeWriter do
       end
     end
 
-    it 'writes assembly to perform a jump', :pending do
+    it 'writes assembly to perform a jump' do
       expect(emulation_of(assembly)).to change_ram.from({}).to(detector.success)
     end
   end

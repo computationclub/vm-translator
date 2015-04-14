@@ -86,6 +86,13 @@ class CodeWriter
     output.puts "($#{label})"
   end
 
+  def write_goto(label)
+    output.puts <<-EOF
+      @$#{label}
+      0;JMP
+    EOF
+  end
+
   def write_if(label)
     pop_stack_into_d
     output.puts <<-EOF
