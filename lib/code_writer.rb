@@ -109,6 +109,61 @@ class CodeWriter
     end
   end
 
+  def write_call(function_name, num_args)
+    return_label = generate_label
+
+    output.puts <<-EOF
+      @#{return_label}
+      D=A
+      // RAM[SP]=D
+      @SP
+      A=M
+      M=D
+      // SP++
+      @SP
+      M=M+1
+    EOF
+
+    %w(LCL ARG THIS THAT).each do |label|
+      output.puts <<-EOF
+        @#{label}
+        D=M
+        // RAM[SP]=D
+        @SP
+        A=M
+        M=D
+        // SP++
+        @SP
+        M=M+1
+      EOF
+    end
+
+    output.puts <<-EOF
+      // ARG = SP - num_args - 5
+      @SP
+      D=M
+      @#{num_args + 5}
+      D=D-A
+      @ARG
+      M=D
+    EOF
+
+    output.puts <<-EOF
+      // LCL = SP
+      @SP
+      D=M
+      @LCL
+      M=D
+    EOF
+
+    output.puts <<-EOF
+      @#{function_name}
+      0;JMP
+    EOF
+
+    output.puts "(#{return_label})"
+  end
+
   def write_return
     output.puts <<-EOF
       // FRAME = LCL

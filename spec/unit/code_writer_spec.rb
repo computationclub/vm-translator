@@ -253,22 +253,22 @@ RSpec.describe CodeWriter do
       end
     end
 
-    it 'writes assembly to preserve the caller’s segment pointers', :pending do
+    it 'writes assembly to preserve the caller’s segment pointers' do
       expect(emulation_of(assembly)).to change_ram.from(ram_before).to(saved_pointers_ram)
     end
 
-    it 'writes assembly to set up the callee’s local, argument and stack segment pointers', :pending do
+    it 'writes assembly to set up the callee’s local, argument and stack segment pointers' do
       expect(emulation_of(assembly)).to change_ram.from(ram_before).to(pointers: pointers_after)
     end
 
-    it 'writes assembly to expose the arguments to the callee', :pending do
+    it 'writes assembly to expose the arguments to the callee' do
       expect(emulation_of(assembly)).to change_ram.from(ram_before).to(
         pointers: { argument: pointers_after[:argument] },
         argument: arguments
       )
     end
 
-    it 'writes assembly to transfer control to the callee', :pending do
+    it 'writes assembly to transfer control to the callee' do
       expect(emulation_of(assembly)).to change_ram.from(ram_before).to(detector.success)
     end
   end
