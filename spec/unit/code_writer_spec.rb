@@ -341,7 +341,7 @@ RSpec.describe CodeWriter do
     let(:frame_before) { lifetime.frame_after_call_command }
     let(:frame_after) { lifetime.frame_after_function_command }
 
-    let(:ram_before) { { pointers: frame_before.pointers } }
+    let(:ram_before) { { pointers: frame_before.pointers, local: 1.upto(num_locals).entries } }
     let(:pointers_after) { frame_after.pointers }
 
     before(:example) do
