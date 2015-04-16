@@ -3,6 +3,8 @@ require 'support/helpers/label_helper'
 module AssemblyHelper
   include LabelHelper
 
+  MINEFIELD_LENGTH = 100
+
   def finish_code
     finish_label = fresh_label
 
@@ -23,6 +25,10 @@ module AssemblyHelper
         (#{label})
       }
     ]
+  end
+
+  def minefield_code
+    MINEFIELD_LENGTH.times.map { finish_code }.join
   end
 
   def overwrite_saved_pointers_code(frame, saved_pointers)

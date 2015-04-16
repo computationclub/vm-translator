@@ -39,6 +39,7 @@ ControlFlowDetector = Struct.new(:output) do
 
     output.write jump_code
     output.write finish_code
+    output.write minefield_code
     yield
     output.write success_code
   end
