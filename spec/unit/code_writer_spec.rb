@@ -157,7 +157,7 @@ RSpec.describe CodeWriter do
     let(:detector) { ControlFlowDetector.new(output) }
 
     before(:example) do
-      detector.detect_label(label) do
+      detector.detect_local_label(label) do
         code_writer.write_label label
       end
     end
