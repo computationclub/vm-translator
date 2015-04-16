@@ -29,7 +29,13 @@ ControlFlowDetector = Struct.new(:output) do
   end
 
   def detect_local_label(label)
-    jump_code, _ = jump_and_label_code(label_outside_function(label))
+    detect_global_label label_outside_function(label) do
+      yield
+    end
+  end
+
+  def detect_global_label(label)
+    jump_code, _ = jump_and_label_code(label)
 
     output.write jump_code
     output.write finish_code
