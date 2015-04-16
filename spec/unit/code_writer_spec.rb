@@ -157,7 +157,7 @@ RSpec.describe CodeWriter do
     let(:detector) { ControlFlowDetector.new(output) }
 
     before(:example) do
-      detector.detect_label(label) do
+      detector.detect_local_label(label) do
         code_writer.write_label label
       end
     end
@@ -341,23 +341,39 @@ RSpec.describe CodeWriter do
     let(:frame_before) { lifetime.frame_after_call_command }
     let(:frame_after) { lifetime.frame_after_function_command }
 
-    let(:ram_before) { { pointers: frame_before.pointers } }
+    let(:ram_before) { { pointers: frame_before.pointers, local: 1.upto(num_locals).entries } }
     let(:pointers_after) { frame_after.pointers }
 
-    before(:example) do
-      code_writer.write_function function_name, num_locals
+    context 'without instrumentation' do
+      before(:example) do
+        code_writer.write_function function_name, num_locals
+      end
+
+      it 'writes assembly to set up the callee’s local variables' do
+        expect(emulation_of(assembly)).to change_ram.from(ram_before).to(
+          pointers: { local: pointers_after[:local] },
+          local: num_locals.times.map { 0 }
+        )
+      end
+
+      it 'writes assembly to move the callee’s stack pointer past its local variables' do
+        expect(emulation_of(assembly)).to change_ram.
+          from(ram_before).to(pointers: { stack: pointers_after[:stack] })
+      end
     end
 
-    it 'writes assembly to set up the callee’s local variables' do
-      expect(emulation_of(assembly)).to change_ram.from(ram_before).to(
-        pointers: { local: pointers_after[:local] },
-        local: num_locals.times.map { 0 }
-      )
-    end
+    context 'with instrumentation' do
+      let(:detector) { ControlFlowDetector.new(output) }
 
-    it 'writes assembly to move the callee’s stack pointer past its local variables' do
-      expect(emulation_of(assembly)).to change_ram.
-        from(ram_before).to(pointers: { stack: pointers_after[:stack] })
+      before(:example) do
+        detector.detect_global_label(function_name) do
+          code_writer.write_function function_name, num_locals
+        end
+      end
+
+      it 'writes assembly to insert a label' do
+        expect(emulation_of(assembly)).to change_ram.from(ram_before).to(detector.success)
+      end
     end
   end
 
