@@ -139,12 +139,12 @@ RSpec.describe CodeWriter do
       end
     end
 
-    it 'writes assembly to initialise the stack pointer', :pending do
+    it 'writes assembly to initialise the stack pointer' do
       expect(emulation_of(assembly)).to change_ram.
         from({}).to(pointers: { stack: pointers_after[:stack] })
     end
 
-    it 'writes assembly to transfer control to system init function', :pending do
+    it 'writes assembly to transfer control to system init function' do
       expect(emulation_of(assembly)).to change_ram.from({}).to(detector.success)
     end
   end

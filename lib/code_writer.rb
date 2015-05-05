@@ -11,6 +11,18 @@ class CodeWriter
     output.close
   end
 
+  def write_init
+    output.puts <<-EOF
+      // RAM[SP] = 256
+      @256
+      D=A
+      @SP
+      M=D
+    EOF
+
+    write_call("Sys.init", 0)
+  end
+
   def write_arithmetic(command)
     case command
     when 'add', 'sub', 'and', 'or'

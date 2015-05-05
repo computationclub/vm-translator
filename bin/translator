@@ -11,6 +11,10 @@ input = ARGF.read
 parser = Parser.new(input)
 code_writer = CodeWriter.new(STDOUT)
 
+if options.include? '--init'
+  code_writer.write_init
+end
+
 while parser.has_more_commands?
   parser.advance
 
