@@ -5,6 +5,7 @@ class CodeWriter
   end
 
   def set_file_name(filename)
+    @filename = filename
   end
 
   def close
@@ -95,12 +96,12 @@ class CodeWriter
   end
 
   def write_label(label)
-    output.puts "($#{label})"
+    output.puts "(#{function_name}$#{label})"
   end
 
   def write_goto(label)
     output.puts <<-EOF
-      @$#{label}
+      @#{function_name}$#{label}
       0;JMP
     EOF
   end
@@ -109,12 +110,13 @@ class CodeWriter
     pop_stack_into_d
     output.puts <<-EOF
       // Jump to the label's address if D is nonzero
-      @$#{label}
+      @#{function_name}$#{label}
       D;JNE
     EOF
   end
 
   def write_function(function_name, num_locals)
+    @function_name = function_name
     output.puts "(#{function_name})"
     num_locals.times do
       write_push 'constant', 0
@@ -248,7 +250,7 @@ class CodeWriter
 
   private
 
-  attr_reader :output
+  attr_reader :output, :filename, :function_name
 
   def write_push(segment, index)
     case segment
@@ -314,7 +316,7 @@ class CodeWriter
     when 'pointer'
       3 + offset
     when 'static'
-      "STATIC.#{offset}"
+      "#{filename}.#{offset}"
     else
       base_address(segment)
     end
@@ -356,6 +358,6 @@ class CodeWriter
 
   def generate_label
     @counter += 1
-    "LABEL#{@counter}"
+    "LABEL.#{@counter}"
   end
 end

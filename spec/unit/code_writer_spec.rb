@@ -415,7 +415,7 @@ RSpec.describe CodeWriter do
         code_writer.write_push_pop Parser::C_PUSH, 'static', 1
       end
 
-      it 'writes assembly that uses independent static variables for each file', :pending do
+      it 'writes assembly that uses independent static variables for each file' do
         expect(emulation_of(assembly)).to change_ram.from(stack: []).to(stack: [10, 20])
       end
     end
@@ -468,7 +468,7 @@ RSpec.describe CodeWriter do
         code_writer.write_return
       end
 
-      it 'writes assembly that uses independent labels for each function', :pending do
+      it 'writes assembly that uses independent labels for each function' do
         expect(emulation_of(assembly)).to change_ram.from(stack: []).to(stack: [20, 40])
       end
     end
