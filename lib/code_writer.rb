@@ -217,11 +217,7 @@ class CodeWriter
   def write_push(segment, index)
     case segment
     when 'constant'
-      output.puts <<-EOF
-        // Load index into D
-        @#{index}
-        D=A
-      EOF
+      output.push_value(index)
     else
       load_base_address_into_r13(segment, index)
       output.puts <<-EOF
@@ -229,9 +225,9 @@ class CodeWriter
         A=M
         D=M
       EOF
-    end
 
-    output.push_register_d
+      output.push_register_d
+    end
   end
 
   def load_base_address_into_r13(segment, offset)
