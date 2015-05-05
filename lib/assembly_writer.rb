@@ -27,6 +27,10 @@ AssemblyWriter = Struct.new(:output) do
     EOF
   end
 
+  def define_label(label)
+    output.puts "(#{label})"
+  end
+
   def jump_to(label)
     output.puts <<-EOF
       @#{label}

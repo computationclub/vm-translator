@@ -62,18 +62,17 @@ class CodeWriter
         // M[SP-1] = 0
         M=0
       EOF
-
       output.jump_to(end_label)
 
+      output.define_label(true_label)
       output.puts <<-EOF
-        (#{true_label})
         // Load M[SP]
         @SP
         A=M-1
         // M[SP-1] = -1
         M=-1
-        (#{end_label})
       EOF
+      output.define_label(end_label)
     end
   end
 
@@ -93,7 +92,7 @@ class CodeWriter
   end
 
   def write_label(label)
-    output.puts "(#{function_name}$#{label})"
+    output.define_label("#{function_name}$#{label}")
   end
 
   def write_goto(label)
@@ -155,7 +154,7 @@ class CodeWriter
     EOF
 
     output.jump_to(function_name)
-    output.puts "(#{return_label})"
+    output.define_label(return_label)
   end
 
   def write_return
