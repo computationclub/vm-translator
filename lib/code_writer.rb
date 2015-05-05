@@ -61,9 +61,11 @@ class CodeWriter
         A=M-1
         // M[SP-1] = 0
         M=0
-        // Jump to (END)
-        @#{end_label}
-        0;JMP
+      EOF
+
+      output.jump_to(end_label)
+
+      output.puts <<-EOF
         (#{true_label})
         // Load M[SP]
         @SP
@@ -81,7 +83,7 @@ class CodeWriter
       write_push(segment, index)
     when Parser::C_POP
       load_base_address_into_r13(segment, index)
-      pop_stack_into_d
+      output.pop_register_d
       output.puts <<-EOF
         @R13
         A=M
@@ -95,14 +97,11 @@ class CodeWriter
   end
 
   def write_goto(label)
-    output.puts <<-EOF
-      @#{function_name}$#{label}
-      0;JMP
-    EOF
+    output.jump_to("#{function_name}$#{label}")
   end
 
   def write_if(label)
-    pop_stack_into_d
+    output.pop_register_d
     output.puts <<-EOF
       // Jump to the label's address if D is nonzero
       @#{function_name}$#{label}
@@ -155,11 +154,7 @@ class CodeWriter
       M=D
     EOF
 
-    output.puts <<-EOF
-      @#{function_name}
-      0;JMP
-    EOF
-
+    output.jump_to(function_name)
     output.puts "(#{return_label})"
   end
 
@@ -180,7 +175,7 @@ class CodeWriter
     EOF
 
     # *ARG = pop()
-    pop_stack_into_d
+    output.pop_register_d
     output.puts <<-EOF
       @ARG
       A=M     // A=RAM[ARG]
@@ -264,14 +259,6 @@ class CodeWriter
       // Store the destination in R13
       @R13        // A=13
       M=D         // RAM[13]=302
-    EOF
-  end
-
-  def pop_stack_into_d
-    output.puts <<-EOF
-      @SP
-      AM=M-1
-      D=M
     EOF
   end
 

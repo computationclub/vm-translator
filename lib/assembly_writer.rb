@@ -19,6 +19,21 @@ AssemblyWriter = Struct.new(:output) do
     EOF
   end
 
+  def pop_register_d
+    output.puts <<-EOF
+      @SP
+      AM=M-1
+      D=M
+    EOF
+  end
+
+  def jump_to(label)
+    output.puts <<-EOF
+      @#{label}
+      0;JMP
+    EOF
+  end
+
   def store(value:, into:)
     puts <<-EOF
       // RAM[#{into}] = #{value}
