@@ -1,6 +1,8 @@
+require_relative 'assembly_writer'
+
 class CodeWriter
   def initialize(output)
-    @output  = output
+    @output  = AssemblyWriter.new(output)
     @counter = 0
   end
 
@@ -13,14 +15,7 @@ class CodeWriter
   end
 
   def write_init
-    output.puts <<-EOF
-      // RAM[SP] = 256
-      @256
-      D=A
-      @SP
-      M=D
-    EOF
-
+    output.store(value: 256, into: 'SP')
     write_call("Sys.init", 0)
   end
 
@@ -129,27 +124,17 @@ class CodeWriter
     output.puts <<-EOF
       @#{return_label}
       D=A
-      // RAM[SP]=D
-      @SP
-      A=M
-      M=D
-      // SP++
-      @SP
-      M=M+1
     EOF
+
+    output.push_register_d
 
     %w(LCL ARG THIS THAT).each do |label|
       output.puts <<-EOF
         @#{label}
         D=M
-        // RAM[SP]=D
-        @SP
-        A=M
-        M=D
-        // SP++
-        @SP
-        M=M+1
       EOF
+
+      output.push_register_d
     end
 
     output.puts <<-EOF
@@ -269,15 +254,7 @@ class CodeWriter
       EOF
     end
 
-    output.puts <<-EOF
-      // RAM[SP]=D
-      @SP
-      A=M
-      M=D
-      // SP++
-      @SP
-      M=M+1
-    EOF
+    output.push_register_d
   end
 
   def load_base_address_into_r13(segment, offset)
