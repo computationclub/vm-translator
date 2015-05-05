@@ -7,6 +7,24 @@ AssemblyWriter = Struct.new(:output) do
     output.puts(str)
   end
 
+  def push_value(value)
+    puts <<-EOF
+      @#{value}
+      D=A
+    EOF
+
+    push_register_d
+  end
+
+  def push_value_at(address)
+    puts <<-EOF
+      @#{address}
+      D=M
+    EOF
+
+    push_register_d
+  end
+
   def push_register_d
     puts <<-EOF
       // RAM[SP]=D

@@ -118,21 +118,10 @@ class CodeWriter
 
   def write_call(function_name, num_args)
     return_label = generate_label
-
-    output.puts <<-EOF
-      @#{return_label}
-      D=A
-    EOF
-
-    output.push_register_d
+    output.push_value(return_label)
 
     %w(LCL ARG THIS THAT).each do |label|
-      output.puts <<-EOF
-        @#{label}
-        D=M
-      EOF
-
-      output.push_register_d
+      output.push_value_at(label)
     end
 
     output.puts <<-EOF
@@ -235,7 +224,7 @@ class CodeWriter
     case segment
     when 'constant'
       output.puts <<-EOF
-        // Load index into M[SP]
+        // Load index into D
         @#{index}
         D=A
       EOF
