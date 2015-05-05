@@ -134,13 +134,7 @@ class CodeWriter
       M=D
     EOF
 
-    output.puts <<-EOF
-      // LCL = SP
-      @SP
-      D=M
-      @LCL
-      M=D
-    EOF
+    output.copy(from: 'SP', to: 'LCL')
 
     output.jump_to(function_name)
     output.define_label(return_label)

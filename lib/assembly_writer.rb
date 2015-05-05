@@ -65,4 +65,14 @@ AssemblyWriter = Struct.new(:output) do
       M=D
     EOF
   end
+
+  def copy(from:, to:)
+    puts <<-EOF
+      // RAM[#{to}] = RAM[#{from}]
+      @#{from}
+      D=M
+      @#{to}
+      M=D
+    EOF
+  end
 end
