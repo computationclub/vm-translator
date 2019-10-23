@@ -2,7 +2,7 @@ language: ruby
 rvm:
   - 2.2.1
 before_script:
-  - curl -O http://nand2tetris.org/software/nand2tetris.zip
+  - curl -L -o nand2tetris.zip 'https://drive.google.com/uc?export=download&id=1KcFPj8KQ_QAHheFmLCqs5iqC_0NCndvs'
   - unzip nand2tetris.zip
   - export EMULATOR=$TRAVIS_BUILD_DIR/nand2tetris/tools/CPUEmulator.sh
 script: bundle exec rspec --format documentation
