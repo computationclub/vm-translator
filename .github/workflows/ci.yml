@@ -12,6 +12,11 @@ jobs:
         with:
           java-version: 11
           distribution: adopt
+      - uses: actions/cache@v2
+        id: cache-nand2tetris
+        with:
+          path: nand2tetris
+          key: nand2tetris
       - run: |
           curl --location --output nand2tetris.zip 'https://drive.google.com/uc?id=1xZzcMIUETv3u3sdpM_oTJSTetpVee3KZ&export=download'
           unzip nand2tetris.zip
