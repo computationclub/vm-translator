@@ -27,7 +27,7 @@ class CodeWriter
         output.puts <<-EOF
           @SP
           // SP--
-          AMD=M-1
+          AM=M-1
           // Load M[SP]
           D=M
           // Load M[SP-1]
@@ -46,7 +46,7 @@ class CodeWriter
         output.puts <<-EOF
           @SP
           // SP--
-          AMD=M-1
+          AM=M-1
           // Load M[SP]
           D=M
           // Load M[SP-1]
