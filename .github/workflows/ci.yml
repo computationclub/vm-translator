@@ -1,0 +1,17 @@
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.0
+          bundler-cache: true
+      - run: |
+          curl --location --output nand2tetris.zip 'https://drive.google.com/uc?id=1xZzcMIUETv3u3sdpM_oTJSTetpVee3KZ&export=download'
+          unzip nand2tetris.zip
+        if: steps.cache-nand2tetris.outputs.cache-hit != 'true'
+      - run: bundle exec rspec
+        env:
+          EMULATOR: nand2tetris/tools/CPUEmulator.sh
