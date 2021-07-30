@@ -8,6 +8,10 @@ jobs:
         with:
           ruby-version: 3.0
           bundler-cache: true
+      - uses: actions/setup-java@v2
+        with:
+          java-version: 11
+          distribution: adopt
       - run: |
           curl --location --output nand2tetris.zip 'https://drive.google.com/uc?id=1xZzcMIUETv3u3sdpM_oTJSTetpVee3KZ&export=download'
           unzip nand2tetris.zip
