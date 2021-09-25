@@ -24,13 +24,8 @@ class CodeWriter
     cache_implementation(command) do
       case command
       when 'add', 'sub', 'and', 'or'
+        output.pop_register_d
         output.puts <<-EOF
-          @SP
-          // SP--
-          MD=M-1
-          // Load M[SP]
-          A=M
-          D=M
           // Load M[SP-1]
           A=A-1
           // Add M[SP] to M[SP-1]
@@ -44,13 +39,8 @@ class CodeWriter
         EOF
       when 'eq', 'gt', 'lt'
         true_label, end_label = 2.times.map { generate_label }
+        output.pop_register_d
         output.puts <<-EOF
-          @SP
-          // SP--
-          MD=M-1
-          // Load M[SP]
-          A=M
-          D=M
           // Load M[SP-1]
           A=A-1
           // Subtract M[SP-1] from M[SP]
